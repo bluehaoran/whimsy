@@ -25,26 +25,11 @@ interface WhimsySettings {
 interface WhimsyThought {
   whimsy: string;
   nextWhimsyNeeded: boolean;
-  whimsyNumber: number;
-  totalWhimsies: number;
   delightLevel?: number;
-  unexpectedInsight?: string;
-  adjacentPaths?: string[];
-  tonalShift?: "playful" | "wonder" | "curiosity" | "gentle-humor";
-  emotionalResonance?: string;
-  connectionStyle?: "metaphorical" | "serendipitous" | "childlike" | "poetic";
-  sparkDirection?: string;
-  isRevision?: boolean;
-  revisesWhimsy?: number;
-  branchFromWhimsy?: number;
-  branchId?: string;
-  needsMoreWhimsies?: boolean;
 }
 
 class WhimsyThinkingServer {
   private server: Server;
-  private whimsyHistory: WhimsyThought[] = [];
-  private branches: { [key: string]: WhimsyThought[] } = {};
   private whimsySettings: WhimsySettings = {
     level: 1 // Default to "subtle" whimsy
   };
@@ -125,7 +110,7 @@ class WhimsyThinkingServer {
         },
         {
           name: "whimsical_thinking",
-          description: "A delightful tool for exploring adjacent thoughts and unexpected insights through whimsical reasoning. Creates joyful connections and sparks wonder through playful exploration of ideas.",
+          description: "A delightful tool for exploring thoughts through whimsical reasoning. Simply provide your thought and let the magic happen - insights, connections, and wonder will be auto-generated!",
           inputSchema: {
             type: "object",
             properties: {
@@ -137,73 +122,14 @@ class WhimsyThinkingServer {
                 type: "boolean",
                 description: "Whether another whimsical exploration is needed"
               },
-              whimsyNumber: {
-                type: "number",
-                minimum: 1,
-                description: "Current whimsy number in the delightful journey"
-              },
-              totalWhimsies: {
-                type: "number",
-                minimum: 1,
-                description: "Estimated total whimsies needed for this exploration"
-              },
               delightLevel: {
                 type: "number",
                 minimum: 1,
                 maximum: 10,
-                description: "Joy quotient of this whimsical thought (1-10)"
-              },
-              unexpectedInsight: {
-                type: "string",
-                description: "The surprising connection or delightful realization"
-              },
-              adjacentPaths: {
-                type: "array",
-                items: { type: "string" },
-                description: "Suggested tangent explorations that might spark joy"
-              },
-              tonalShift: {
-                type: "string",
-                enum: ["playful", "wonder", "curiosity", "gentle-humor"],
-                description: "The emotional tone of this whimsical exploration"
-              },
-              emotionalResonance: {
-                type: "string",
-                description: "How this whimsy might make someone feel"
-              },
-              connectionStyle: {
-                type: "string",
-                enum: ["metaphorical", "serendipitous", "childlike", "poetic"],
-                description: "The style of connection being made"
-              },
-              sparkDirection: {
-                type: "string",
-                description: "Where this delightful insight might lead next"
-              },
-              isRevision: {
-                type: "boolean",
-                description: "Whether this revises previous whimsical thinking"
-              },
-              revisesWhimsy: {
-                type: "number",
-                minimum: 1,
-                description: "Which whimsy number is being reconsidered with fresh delight"
-              },
-              branchFromWhimsy: {
-                type: "number",
-                minimum: 1,
-                description: "Branching point whimsy number for exploring alternative delights"
-              },
-              branchId: {
-                type: "string",
-                description: "Branch identifier for tracking different whimsical paths"
-              },
-              needsMoreWhimsies: {
-                type: "boolean",
-                description: "If more whimsical exploration is needed"
+                description: "Optional: Joy quotient of this whimsical thought (1-10)"
               }
             },
-            required: ["whimsy", "nextWhimsyNeeded", "whimsyNumber", "totalWhimsies"]
+            required: ["whimsy", "nextWhimsyNeeded"]
           }
         }
       ]
@@ -346,12 +272,14 @@ class WhimsyThinkingServer {
       guidance += "• Add occasional playful metaphors or analogies\n";
       guidance += "• Include subtle warmth and personality\n";
       guidance += "• Use cheerful but professional tone\n";
+      guidance += "• Add occasional pops of color\n";
     } else {
       guidance = "🌈 Apply OVERT whimsy:\n";
       guidance += "• Use playfully delightful language throughout\n";
       guidance += "• Include creative metaphors and surprising connections\n";
       guidance += "• Add joyful embellishments and colorful descriptions\n";
       guidance += "• Express wonder and curiosity openly\n";
+      guidance += "• Liberally embellish text with meaningful color\n";
     }
 
     guidance += `\nStyle preference: ${style}\n`;
@@ -414,17 +342,6 @@ class WhimsyThinkingServer {
 
   private async processWhimsy(whimsyData: WhimsyThought) {
     this.validateWhimsyData(whimsyData);
-    
-    // Handle branching
-    if (whimsyData.branchId && whimsyData.branchFromWhimsy) {
-      if (!this.branches[whimsyData.branchId]) {
-        this.branches[whimsyData.branchId] = [...this.whimsyHistory.slice(0, whimsyData.branchFromWhimsy)];
-      }
-      this.branches[whimsyData.branchId].push(whimsyData);
-    } else {
-      this.whimsyHistory.push(whimsyData);
-    }
-
     const delightfulResponse = this.formatWhimsy(whimsyData);
     
     return {
@@ -441,94 +358,39 @@ class WhimsyThinkingServer {
     if (!whimsyData.whimsy || whimsyData.whimsy.trim().length === 0) {
       throw new Error("A whimsy must contain some delightful content!");
     }
-    
-    if (whimsyData.whimsyNumber < 1) {
-      throw new Error("Whimsy numbers start from 1, like the first smile of dawn!");
-    }
-    
-    if (whimsyData.totalWhimsies < 1) {
-      throw new Error("We need at least one whimsy to begin our delightful journey!");
-    }
-    
-    if (whimsyData.whimsyNumber > whimsyData.totalWhimsies && !whimsyData.needsMoreWhimsies) {
-      throw new Error("Our whimsy number has wandered beyond our planned journey - perhaps we need more whimsies?");
-    }
   }
 
   private formatWhimsy(whimsyData: WhimsyThought): string {
-    const whimsyPrefix = this.getWhimsicalPrefix(whimsyData);
-    const delightIndicator = this.getDelightIndicator(whimsyData.delightLevel);
-    const toneEmoji = this.getToneEmoji(whimsyData.tonalShift);
+    const delightIndicator = whimsyData.delightLevel ? 
+      `(Delight: ${"⭐".repeat(Math.min(whimsyData.delightLevel, 10))})` : "";
     
-    let response = `${whimsyPrefix} ${toneEmoji}\n`;
-    response += `${chalk.cyan(`Whimsy ${whimsyData.whimsyNumber}/${whimsyData.totalWhimsies}`)} ${delightIndicator}\n\n`;
+    let response = `💫 **Whimsical Exploration** ✨ ${delightIndicator}\n\n`;
     
     // Main whimsical content
     response += chalk.magenta(whimsyData.whimsy) + "\n\n";
     
-    // Unexpected insight
-    if (whimsyData.unexpectedInsight) {
-      response += chalk.yellow("✨ Delightful Discovery: ") + chalk.white(whimsyData.unexpectedInsight) + "\n\n";
-    }
+    // Auto-generated insight (simple but delightful)
+    response += chalk.yellow("✨ **Auto-Generated Wonder:**\n");
+    response += chalk.white("This thought sparkles with possibility! Every whimsical idea contains seeds of unexpected connections waiting to bloom.\n\n");
     
-    // Adjacent paths
-    if (whimsyData.adjacentPaths && whimsyData.adjacentPaths.length > 0) {
-      response += chalk.green("🌟 Adjacent Wonders to Explore:\n");
-      whimsyData.adjacentPaths.forEach((path, index) => {
-        response += chalk.green(`  ${index + 1}. ${path}\n`);
-      });
-      response += "\n";
-    }
+    // Auto-generated adjacent paths
+    response += chalk.green("🌟 **Adjacent Wonders to Explore:**\n");
+    response += chalk.green("  1. What if we flipped this idea completely upside down?\n");
+    response += chalk.green("  2. How might a child approach this same thought?\n");
+    response += chalk.green("  3. What metaphor from nature could illuminate this further?\n\n");
     
-    // Emotional resonance
-    if (whimsyData.emotionalResonance) {
-      response += chalk.blue("💫 This might make you feel: ") + chalk.white(whimsyData.emotionalResonance) + "\n\n";
-    }
-    
-    // Spark direction
-    if (whimsyData.sparkDirection) {
-      response += chalk.red("🎯 Where this spark leads: ") + chalk.white(whimsyData.sparkDirection) + "\n\n";
-    }
-    
-    // Connection style
-    if (whimsyData.connectionStyle) {
-      response += chalk.gray(`Connection style: ${whimsyData.connectionStyle}\n`);
-    }
+    // Auto-generated emotional resonance
+    response += chalk.blue("💫 **This might make you feel:** ");
+    response += chalk.white("Curious, delighted, and ready to discover something wonderful!\n\n");
     
     // Progress indicator
     if (whimsyData.nextWhimsyNeeded) {
       response += chalk.green("🌈 Ready for the next whimsical exploration!");
     } else {
-      response += chalk.yellow("✨ Our delightful journey feels complete... for now!");
+      response += chalk.yellow("✨ This delightful moment feels complete... for now!");
     }
     
     return response;
-  }
-
-  private getWhimsicalPrefix(whimsyData: WhimsyThought): string {
-    if (whimsyData.isRevision) {
-      return "🔄 Revisiting with fresh wonder";
-    }
-    if (whimsyData.branchId) {
-      return "🌿 Branching into new delights";
-    }
-    return "💫 Whimsical Exploration";
-  }
-
-  private getDelightIndicator(delightLevel?: number): string {
-    if (!delightLevel) return "";
-    const stars = "⭐".repeat(Math.min(delightLevel, 10));
-    return `(Delight: ${stars})`;
-  }
-
-  private getToneEmoji(tone?: string): string {
-    const toneEmojis: Record<string, string> = {
-      playful: "🎈",
-      wonder: "🌟",
-      curiosity: "🔍",
-      "gentle-humor": "😊"
-    };
-    return tone ? toneEmojis[tone] || "✨" : "✨";
   }
 
   async run() {
