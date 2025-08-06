@@ -2,3 +2,7 @@
 .env*
 dist/*
 node_modules/*
+
+# MCP and Claude configuration files
+.claude.json
+.mcp.json
