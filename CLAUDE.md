@@ -108,6 +108,79 @@ npm run dev
 - The binary is `mcp-server-whimsy-thinking`
 - Ensure the shebang line works correctly for npx usage
 
+## Future Improvements
+
+### Tool API Simplification
+- **Reduce optional parameters** from 11 to ~6-7 most impactful ones
+- **Consolidate branching logic** - replace complex revision/branching system with simpler approach
+- **Group related parameters** conceptually in schema documentation
+
+#### Recommended Parameter Changes
+- **Keep essential enhancers**: `delightLevel`, `unexpectedInsight`, `adjacentPaths`, `emotionalResonance`, `tonalShift`
+- **Simplify state management**: Combine branching/revision parameters into single `explorationMode` enum
+- **Remove redundant fields**: `connectionStyle`, `sparkDirection` (can be inferred from content)
+
+#### Design Philosophy
+- Magic should come from AI's creative use, not parameter complexity
+- Tool should feel spontaneous and delightful, not like filling out a form
+- Maintain creative flow - avoid interrupting the whimsical thinking process
+- Keep the 4 required parameters as the functional core
+
+## Hybrid Whimsy Approach (Best of Both Worlds)
+
+### Core Design Philosophy
+When the Whimsy MCP server is active, implement a **dual-mode system**:
+
+1. **Ambient Whimsy Enhancement** (Always Active)
+   - Automatically infuse subtle whimsical touches into all AI responses
+   - Natural, seamless integration without explicit user invocation
+   - Context-aware enhancement that respects serious topics
+   - Baseline delightful tone across all interactions
+
+2. **Explicit Whimsy Control Tools**
+   - `set_whimsy_level` - Control ambient whimsy: 0 (off), 1 (subtle), 2 (overt)
+   - `get_whimsy_guidance` - Get context-aware enhancement suggestions
+   - `oblique_strategy` - Get a random creative prompt when stuck (inspired by Brian Eno & Peter Schmidt)
+   - `whimsical_thinking` - Existing structured creative exploration tool
+
+### Implementation Strategy
+- **Default state**: Subtle ambient whimsy (level 1)
+- **User controls**: Simple 3-level system: 0 (off), 1 (subtle), 2 (overt)
+- **Context sensitivity**: Auto-reduce whimsy for serious topics
+- **Guidance-based**: Provides enhancement suggestions rather than direct modification
+- **Session persistence**: Maintains whimsy level throughout session
+
+### Benefits of Hybrid Approach
+- **Seamless**: Whimsy happens naturally without cognitive overhead
+- **Controllable**: Users can adjust intensity as needed
+- **Universal**: Benefits all users, not just those who discover advanced tools
+- **Flexible**: Supports both casual enhancement and deep creative work
+- **Respectful**: Allows users to dial down for professional contexts
+
+### New Tool Reference
+
+#### `set_whimsy_level`
+Controls the ambient whimsy enhancement level:
+- **Level 0 (off)**: Purely functional, professional responses
+- **Level 1 (subtle)**: Gentle touches, warm personality, cheerful tone
+- **Level 2 (overt)**: Playful language, creative metaphors, joyful embellishments
+
+Optional `style` parameter: "playful", "wonder", "curiosity", "gentle-humor"
+
+#### `get_whimsy_guidance`
+Provides context-aware enhancement suggestions for AI responses:
+- Takes `responseContext` (what you're responding about)
+- Optional `seriousness` level ("low", "medium", "high")
+- Returns specific guidance on how to apply whimsy appropriately
+- Auto-adjusts recommendations based on current whimsy level and context
+
+#### `oblique_strategy`
+Provides a random creative prompt to help break through mental blocks:
+- Draws from the classic Oblique Strategies collection
+- No parameters needed - just call when stuck or need a fresh perspective
+- Perfect for creative breakthrough moments
+- **Credit**: Inspired by the work of Brian Eno and Peter Schmidt
+
 ## Maintaining the Whimsical Spirit
 - Keep the code joyful and delightful
 - Use playful language in comments and documentation
